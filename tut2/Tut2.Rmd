@@ -1,0 +1,157 @@
+---
+title: "Tutorial 2"
+author: "Alicia Soh Su Xian A0114334U"
+date: "January 29, 2016"
+output: md_document
+---
+
+```{r, echo=FALSE, message=FALSE}
+library(ggplot2)
+library(dplyr)
+library(plyr)
+```
+
+Q1ai.
+
+```{r, echo=FALSE}
+labsdata <- read.csv(file="labs.csv")
+
+d <- ggplot(labsdata, aes(WaitTime)) + geom_bar() + labs(title ="Waiting Time Graph", x = "Waiting Time", y = "Count")
+
+plot(d)
+
+dplyr::summarise(labsdata, Average_Waiting_Time = mean(WaitTime))
+```
+
+The KPI for waiting time could be averaged to 69.76821mins/patient.
+
+Q1aii.
+
+```{r, echo=FALSE}
+
+slices <- c(126, 25) 
+lbls <- c("Satisfied", "Not Satisfied")
+pct <- round(slices/sum(slices)*100)
+lbls <- paste(lbls, pct) # add percents to labels 
+lbls <- paste(lbls,"%",sep="") # ad % to labels 
+pie(slices,labels = lbls, col=rainbow(length(lbls)),
+  	main="Pie Chart of Service Satisfaction")
+
+count(labsdata, 'SvcSat')
+```
+
+The KPI for Service Standard could be averaged to 126/126+25 = 83%.
+
+Q1b.
+
+```{r, echo=FALSE}
+
+g <- ggplot(labsdata, aes(Gender, SvcSat))+geom_count()+labs(title ="Service Satisfaction against Gender Graph", x = "Gender", y = "Service Satisfaction")
+
+plot(g)
+
+```
+
+Female:
+```{r, echo=FALSE}
+
+female<-
+  labsdata %>%
+  filter(Gender == 'F')
+count(female, 'SvcSat')
+
+slices <- c(73, 9) 
+lbls <- c("Satisfied", "Not Satisfied")
+pct <- round(slices/sum(slices)*100)
+lbls <- paste(lbls, pct) # add percents to labels 
+lbls <- paste(lbls,"%",sep="") # ad % to labels 
+pie(slices,labels = lbls, col=rainbow(length(lbls)),
+  	main="Pie Chart of Service Satisfaction for Females")
+```
+
+
+Male:
+```{r, echo=FALSE}
+
+male<-
+  labsdata %>%
+  filter(Gender == 'M')
+count(male, 'SvcSat')
+
+slices <- c(53, 16) 
+lbls <- c("Satisfied", "Not Satisfied")
+pct <- round(slices/sum(slices)*100)
+lbls <- paste(lbls, pct) # add percents to labels 
+lbls <- paste(lbls,"%",sep="") # ad % to labels 
+pie(slices,labels = lbls, col=rainbow(length(lbls)),
+  	main="Pie Chart of Service Satisfaction for Males")
+```
+
+From the pie charts we can see that:
+Females have a higher percentage (89%) of being satisfied with the service as compared to males (73%).
+
+```{r, echo=FALSE, message=FALSE}
+
+f <- ggplot(labsdata, aes(SvcSat, AGE)) + geom_dotplot(binaxis = "y",
+stackdir = "center")+labs(title ="Age against Service Satisfaction Graph", x = "Service Satisfaction", y = "Age")
+
+plot(f)
+```
+
+From the graph above, we can see that the younger adults are more likely to input their Service Satisfaction as 'Y' (Satisfied), while the elderly are more likely to input their Service Satisfaction as 'N' (Not satisfied).
+
+```{r, echo=FALSE, message=FALSE}
+
+ff <- ggplot(labsdata, aes(SvcSat, Gender))+geom_tile(aes(fill = AGE))
+plot(ff)
+```
+
+From the graph above, where all 3 variables are included, we can see that the older adults are more likely to be unsatisfied with the service while the younger aduts are more likely to be satisfied with the service. 
+
+In addition, using the 1st graph above, we can tell that males are more likely to be unsatisfied as compared to the females.
+
+Qc.
+
+```{r, echo=FALSE, message=FALSE}
+
+d <- ggplot(labsdata, aes(SvcSat, WaitTime)) + geom_dotplot(binaxis = "y",
+stackdir = "center")+labs(title ="Waiting Time against Service Satisfaction Graph", x = "Service Satisfaction", y = "Waiting Time")
+
+plot(d)
+```
+
+As according to the graph above, we can conclude that there is a correlation between waiting time and service satisfaction. For waiting times that are longer than 75mins, patients are more likely to be unsatisfied (N). On the other hand, shorter waiting times clearly show satisfied results (Y).
+
+Qd.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+
+labsdatanew <- labsdata %>% mutate(labsdata, BMI = (WT)/(HT*HT))
+
+s <- ggplot(labsdatanew, aes(BMI, TC)) + geom_point()+geom_abline(intercept = -29.391577, slope = 3.552667)+labs(title ="Total Cholesterol against BMI Graph", x = "BMI", y = "Total Cholesterol")
+plot(s)
+
+coef(lm(TC ~ BMI, data = labsdatanew))
+
+```
+
+As seen from the results obtained above, it shows that there is a positive correlation between BMI and Total Cholesterol. When BMI increases, Total Cholesterol will also increase.
+
+Qe.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+
+labsdatanewnew <- filter(labsdatanew, Gender == "M", ETHNIC == "C")
+labsdatanewnewnew <-  mutate(labsdatanewnew, BMI = (WT)/(HT*HT))
+
+model <- glm(formula=BMI ~ SBP + AGE, data=labsdatanewnewnew)
+newdata <- data.frame(SBP=135, AGE=45)
+predict(model, newdata)
+
+```
+
+Assumptions:
+
+1. All Chinese Males are the same. Thus, is it possible to predict the BMI based on other Chinese Males data
+
+Hence, using the predict() function, his BMI would be 24.50793.
