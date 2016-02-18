@@ -1,0 +1,45 @@
+<!-- R Commander Markdown Template -->
+
+Tutorial 5
+=======================
+
+### Soh Su Xian Alicia A0114334U
+
+### `r as.character(Sys.Date())`
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+# include this code chunk as-is to set options
+knitr::opts_chunk$set(comment=NA, prompt=TRUE, out.width=750, fig.height=8, fig.width=8)
+library(Rcmdr)
+library(car)
+library(RcmdrMisc)
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+library(foreign, pos=15)
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+country <- read.spss("C:/Users/Hp/Documents/country122.sav", 
+  use.value.labels=TRUE, max.value.labels=Inf, to.data.frame=TRUE)
+colnames(country) <- tolower(colnames(country))
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+RegModel.1 <- lm(lifeexpf~birthrat, data=country)
+summary(RegModel.1)
+```
+
+
+Answer: Since the p-value: < 2.2e-16 (less than 0.05), this tells us that there is a linear relationship between the two variables.
+From the data obtained, the correlation coefficient is 0.869 (3sf). This can be calculated by square rooting the Multiple R-squared:  0.756.
+Since the value is close to 1, the linear relationship is relatively strong. 
+The linear relationship is downwards (as seen from the graph below). The higher the birth rate, the lower the life expectancy.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+scatterplot(lifeexpf~birthrat, reg.line=lm, smooth=FALSE, spread=FALSE, 
+  boxplots=FALSE, span=0.5, ellipse=FALSE, levels=c(.5, .9), jitter=list(x=1),
+   data=country)
+```
+
+
